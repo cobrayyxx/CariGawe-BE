@@ -2,8 +2,6 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from database import SessionLocal, engine, get_db
-from job.repository import get_job_by_id, num_of_accepted_requests
-from job.schemas import JobInDB
 from . import schemas
 import models
 import psycopg2
@@ -15,20 +13,6 @@ def get_user_job_by_pk(db: Session, job_id: int, username: str):
 
 
 def create_user_job(db: Session, item: schemas.UserJob):
-    db_job: JobInDB = get_job_by_id(db, item.job_id)
-    if db_job.status == 'closed':
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Lowongan sudah ditutup",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    if num_of_accepted_requests(db_job) >= db_job.num_participants:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Lowongan sudah penuh",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
     try:
         db_item = models.UserJob(**item.dict())
 
