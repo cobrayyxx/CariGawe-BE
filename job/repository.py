@@ -63,6 +63,6 @@ def create_job(db: Session, item: schemas.Job):
 
 
 def upload_image(file: Optional[UploadFile] = File(None)):
-    result = cloudinary.uploader.upload(file.file)
+    result = cloudinary.uploader.upload(file.file,  folder = 'carigawe')
     url = result.get("url")
     return url
