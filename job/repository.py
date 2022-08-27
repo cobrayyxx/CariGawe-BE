@@ -1,11 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
 from auth.auth_schemas import UserInDB
 from database import SessionLocal, engine, get_db
 from userjob.schemas import Status
 from . import schemas
 import models
-
+import cloudinary
+import cloudinary.uploader
+from typing import Optional
 
 def get_job(db: Session = Depends(get_db), skip: int = 0, limit: int = 100):
     return db.query(models.Job).offset(skip).limit(limit).all()
@@ -54,3 +56,8 @@ def create_job(db: Session, item: schemas.Job):
     db.commit()
     db.refresh(db_item)
     return db_item
+
+def upload_image(file: Optional[UploadFile] = File(None)):
+    result = cloudinary.uploader.upload(file.file)
+    url = result.get("url")
+    return url

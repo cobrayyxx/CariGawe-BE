@@ -1,7 +1,7 @@
-from fastapi import Depends, FastAPI, HTTPException, APIRouter, status
+from fastapi import Depends, FastAPI, HTTPException, APIRouter, status, UploadFile, File, Form
 from sqlalchemy.orm import Session
 from auth.auth_controller import get_current_active_user
-
+from typing import Optional
 from auth.auth_schemas import UserInDB
 
 from . import repository, schemas
@@ -29,8 +29,14 @@ def get_by_id(job_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/job/", response_model=schemas.JobInDB)
-def create_job(item: schemas.Job, current_user: UserInDB = Depends(get_current_active_user), db: Session = Depends(get_db)):
-    item = schemas.JobInDB(**item.dict(), creator=current_user.username)
+def create_job(item: schemas.Job = Form(...), file: Optional[UploadFile] = File(None),current_user: UserInDB = Depends(get_current_active_user),  db: Session = Depends(get_db)):
+    print("masuk")
+    if file.filename != "":
+        url_img = repository.upload_image(file)
+    else:
+        url_img = None
+
+    item = schemas.JobInDB(**item.dict(), creator=current_user.username, image=url_img)
     return repository.create_job(db=db, item=item)
 
 

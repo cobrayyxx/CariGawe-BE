@@ -35,16 +35,16 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        print(payload)
+        # print(payload)
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
         token_data = auth_schemas.TokenData(username=username)
-        print(token_data)
+        # print(token_data)
     except JWTError:
         raise credentials_exception
     user = auth_repo.get_certain_user(db=db, username=token_data.username)
-    print(user)
+    # print(user)
     if user is None:
         raise credentials_exception
     return user
@@ -107,12 +107,12 @@ def register_controller(user: auth_schemas.UserInDB, db: Session = Depends(get_d
     user_dict = user.dict()
     password = user_dict['password']
     user_dict['password'] = get_password_hash(password)
-    print(user_dict)
+    # print(user_dict)
     return auth_repo.register(user=user_dict, db=db)
 
 
 @router.get("/user/{username}", response_model=auth_schemas.UserRead)
 async def get_by_username(username: str, db: Session = Depends(get_db)):
     item = auth_repo.read_user(username, db)
-    print(item)
+    # print(item)
     return item
