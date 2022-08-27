@@ -41,6 +41,7 @@ class Job(BaseModel):
 
 class JobUpdate(Job):
     id: int = Field(None)
+    image: str = Field(None)
 
     class Config:
         orm_mode = True
@@ -49,7 +50,7 @@ class JobUpdate(Job):
 class JobInDB(JobUpdate):
     applicants: list[UserJobInDB] = Field([])
     creator: str = Field(None)
-    image: str = Field(None)
+
 
     class Config:
         orm_mode = True
