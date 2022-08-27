@@ -17,6 +17,7 @@ cloudinary.config(
     secure = True
 )
 
+
 @as_declarative()
 class Base:
     id: Any
