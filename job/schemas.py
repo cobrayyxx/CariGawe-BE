@@ -34,7 +34,7 @@ class Job(BaseModel):
         if isinstance(value, str):
             return cls(**json.loads(value))
         return value
-        
+
     class Config:
         orm_mode = True
 

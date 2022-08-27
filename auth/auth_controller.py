@@ -1,7 +1,8 @@
 from fastapi import APIRouter
 from sqlalchemy.orm import Session
-from fastapi import Depends, FastAPI, HTTPException, APIRouter, UploadFile, File, status
+from fastapi import Depends, FastAPI, HTTPException, APIRouter, UploadFile, File, status, Form
 from database import SessionLocal, engine, get_db
+from job.repository import upload_image
 from . import auth_schemas
 from . import auth_repo
 from passlib.context import CryptContext
@@ -9,7 +10,7 @@ from jose import JWTError, jwt
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from datetime import datetime, timedelta
 from settings import token_settings
-from typing import Union
+from typing import Optional, Union
 
 router = APIRouter(
     prefix="/api/v1",
@@ -102,11 +103,18 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@router.post("/register", response_model=auth_schemas.UserInDB)
-def register_controller(user: auth_schemas.UserInDB, db: Session = Depends(get_db)):
+@router.post("/register", response_model=auth_schemas.UserRead)
+def register_controller(user: auth_schemas.UserInDB = Form(...), file: Optional[UploadFile] = File(None), db: Session = Depends(get_db)):
+    print(type(user))
+    if file and file.filename != "":
+        url_img = upload_image(file)
+    else:
+        url_img = None
+
     user_dict = user.dict()
     password = user_dict['password']
     user_dict['password'] = get_password_hash(password)
+    user_dict['image'] = url_img
     # print(user_dict)
     return auth_repo.register(user=user_dict, db=db)
 
@@ -116,3 +124,15 @@ async def get_by_username(username: str, db: Session = Depends(get_db)):
     item = auth_repo.read_user(username, db)
     # print(item)
     return item
+
+
+@router.put("/user/", response_model=auth_schemas.UserInDB)
+def update_controller(user: auth_schemas.UserBase = Form(...), file: Optional[UploadFile] = File(None), current_user: auth_schemas.UserInDB = Depends(get_current_active_user), db: Session = Depends(get_db)):
+    user = auth_schemas.UserInDB(
+        **user.dict(), username=current_user.username, password=current_user.password)
+    if file and file.filename != "":
+        url_img = upload_image(file)
+        user.image = url_img
+
+    print(type(user))
+    return auth_repo.update_user(item=user, db=db)

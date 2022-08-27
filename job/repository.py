@@ -10,6 +10,7 @@ import cloudinary
 import cloudinary.uploader
 from typing import Optional
 
+
 def get_job(db: Session = Depends(get_db), skip: int = 0, limit: int = 100):
     return db.query(models.Job).offset(skip).limit(limit).all()
 
@@ -26,8 +27,9 @@ def num_of_accepted_requests(job: schemas.JobInDB):
     return count
 
 
-def update_job(db: Session, item: schemas.JobUpdate, current_user: UserInDB):
-    db_item: schemas.JobInDB = get_job_by_id(
+
+def update_job(db: Session, item: schemas.Job, current_user: UserInDB):
+    db_item = get_job_by_id(
         db, item.id)
     print(db_item)
     if db_item.creator != current_user.username:
@@ -61,6 +63,7 @@ def create_job(db: Session, item: schemas.Job):
     db.commit()
     db.refresh(db_item)
     return db_item
+
 
 def upload_image(file: Optional[UploadFile] = File(None)):
     result = cloudinary.uploader.upload(file.file)
