@@ -27,7 +27,6 @@ def num_of_accepted_requests(job: schemas.JobInDB):
     return count
 
 
-
 def update_job(db: Session, item: schemas.Job, current_user: UserInDB):
     db_item = get_job_by_id(
         db, item.id)
@@ -45,12 +44,10 @@ def update_job(db: Session, item: schemas.Job, current_user: UserInDB):
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-
     for var, value in vars(item).items():
         setattr(db_item, var, value) if value or str(
             value) == 'False' else None
-    
-  
+
     db.add(db_item)
     db.commit()
     db.refresh(db_item)

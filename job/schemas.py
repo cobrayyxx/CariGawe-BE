@@ -51,6 +51,5 @@ class JobInDB(JobUpdate):
     applicants: list[UserJobInDB] = Field([])
     creator: str = Field(None)
 
-
     class Config:
         orm_mode = True

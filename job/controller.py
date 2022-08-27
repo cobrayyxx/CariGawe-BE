@@ -30,7 +30,8 @@ def get_by_id(job_id: int, db: Session = Depends(get_db)):
 
 @router.post("/job/", response_model=schemas.JobInDB)
 def create_job(item: schemas.Job = Form(...), file: Optional[UploadFile] = File(None), current_user: UserInDB = Depends(get_current_active_user),  db: Session = Depends(get_db)):
-    if file.filename != "":
+
+    if file and file.filename != "":
         url_img = repository.upload_image(file)
     else:
         url_img = None
@@ -41,10 +42,9 @@ def create_job(item: schemas.Job = Form(...), file: Optional[UploadFile] = File(
 
 
 @router.put("/job/", response_model=schemas.JobInDB)
-def update_job(item: schemas.JobUpdate = Form(...) ,file: Optional[UploadFile] = File(None), current_user: UserInDB = Depends(get_current_active_user), db: Session = Depends(get_db)):
+def update_job(item: schemas.JobUpdate = Form(...), file: Optional[UploadFile] = File(None), current_user: UserInDB = Depends(get_current_active_user), db: Session = Depends(get_db)):
     if file and file.filename != "":
         url_img = repository.upload_image(file)
         item.image = url_img
-
 
     return repository.update_job(db=db, item=item, current_user=current_user)
