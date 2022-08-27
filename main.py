@@ -20,11 +20,7 @@ app.include_router(user_job_controller.router)
 
 
 origins = [
-    'https://carigawe-be.herokuapp.com',
-    'http://carigawe-be.herokuapp.com',
-    "http://localhost",
-    "http://localhost:8080",
-    'http://localhost:3000/'
+    "*"
 ]
 
 app.add_middleware(
