@@ -29,14 +29,15 @@ def get_by_id(job_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/job/", response_model=schemas.JobInDB)
-def create_job(item: schemas.Job = Form(...), file: Optional[UploadFile] = File(None),current_user: UserInDB = Depends(get_current_active_user),  db: Session = Depends(get_db)):
+def create_job(item: schemas.Job = Form(...), file: Optional[UploadFile] = File(None), current_user: UserInDB = Depends(get_current_active_user),  db: Session = Depends(get_db)):
     print("masuk")
     if file.filename != "":
         url_img = repository.upload_image(file)
     else:
         url_img = None
 
-    item = schemas.JobInDB(**item.dict(), creator=current_user.username, image=url_img)
+    item = schemas.JobInDB(
+        **item.dict(), creator=current_user.username, image=url_img)
     return repository.create_job(db=db, item=item)
 
 
