@@ -1,3 +1,4 @@
+from urllib.parse import quote
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
 from auth.auth_schemas import UserInDB
@@ -25,9 +26,10 @@ def num_of_accepted_requests(job: schemas.JobInDB):
     return count
 
 
-def update_job(db: Session, item: schemas.Job, current_user: UserInDB):
+def update_job(db: Session, item: schemas.JobUpdate, current_user: UserInDB):
     db_item: schemas.JobInDB = get_job_by_id(
         db, item.id)
+    print(db_item)
     if db_item.creator != current_user.username:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -40,10 +42,13 @@ def update_job(db: Session, item: schemas.Job, current_user: UserInDB):
             detail=f"Job id {item.job_id} tidak ditemukan",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+
     for var, value in vars(item).items():
         setattr(db_item, var, value) if value or str(
             value) == 'False' else None
-
+    
+  
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
