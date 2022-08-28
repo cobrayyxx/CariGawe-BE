@@ -19,13 +19,17 @@ router = APIRouter(
 @router.get("/job/", response_model=list[schemas.JobInDB])
 def get_job(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     items = repository.get_job(db, skip=skip, limit=limit)
-    return items
+    res = []
+    for item in items:
+        res.append(schemas.JobInDB(
+            **item.__dict__, applicants=item.applicants))
+    return res
 
 
 @router.get("/job/{job_id}", response_model=schemas.JobInDB)
 def get_by_id(job_id: int, db: Session = Depends(get_db)):
-    items = repository.get_job_by_id(db, job_id)
-    return items
+    item = repository.get_job_by_id(db, job_id)
+    return schemas.JobInDB(**item.__dict__, applicants=item.applicants)
 
 
 @router.post("/job/", response_model=schemas.JobInDB)
