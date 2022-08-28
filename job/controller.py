@@ -34,6 +34,7 @@ def get_by_id(job_id: int, db: Session = Depends(get_db)):
 
 @router.post("/job/", response_model=schemas.JobInDB)
 def create_job(item: schemas.Job = Form(...), file: Optional[UploadFile] = File(None), current_user: UserInDB = Depends(get_current_active_user),  db: Session = Depends(get_db)):
+
     if file and file.filename != "":
         url_img = repository.upload_image(file)
     else:

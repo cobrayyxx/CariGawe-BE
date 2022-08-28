@@ -27,8 +27,8 @@ def num_of_accepted_requests(job: schemas.JobInDB):
     return count
 
 
-def update_job(db: Session, item: schemas.JobUpdate, current_user: UserInDB):
-    db_item: schemas.JobInDB = get_job_by_id(
+def update_job(db: Session, item: schemas.Job, current_user: UserInDB):
+    db_item = get_job_by_id(
         db, item.id)
     print(db_item)
     if db_item.creator != current_user.username:
@@ -63,6 +63,6 @@ def create_job(db: Session, item: schemas.Job):
 
 
 def upload_image(file: Optional[UploadFile] = File(None)):
-    result = cloudinary.uploader.upload(file.file)
+    result = cloudinary.uploader.upload(file.file,  folder = 'carigawe')
     url = result.get("url")
     return url

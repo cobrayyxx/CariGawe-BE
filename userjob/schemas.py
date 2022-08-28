@@ -8,6 +8,7 @@ class Status(str, Enum):
     requested = 'requested'
     accepted = 'accepted'
     completed = 'completed'
+    rejected = 'rejected'
 
 
 class UserJob(BaseModel):
